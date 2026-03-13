@@ -1,0 +1,1 @@
+Basic ref point := https://github.com/tonywangcn/distributed-web-crawler/blob/master/go/src/crawler/crawler.go
