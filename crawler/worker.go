@@ -8,9 +8,8 @@ import (
 	"github.com/0Blackraven/webscrapper/utils"
 )
 
-
-	var TotalProcessed   int64
-	var TotalLinksFound int64
+var TotalProcessed int64
+var TotalLinksFound int64
 
 type Worker struct {
 	ID int
@@ -45,7 +44,7 @@ func StartCrawling(workerCount int, crawlerCount int, startURL string) {
 			for {
 				url := utils.GetJob()
 				if url == "" {
-					return 
+					return
 				}
 
 				atomic.AddInt64(&TotalProcessed, 1)

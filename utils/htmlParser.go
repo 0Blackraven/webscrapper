@@ -5,24 +5,31 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"net/url"
+	"strings"
 )
 
 func HtmlParser (url string) []string {
 	var links []string
-	response,geterr := http.Get(url);
+	response, geterr := http.Get(url)
 	if geterr != nil {
-		fmt.Printf("Error in the get response for [%v] \n Error: [%v]",url,geterr);
+		fmt.Printf("Error in the get response for [%v] \n Error: [%v]\n", url, geterr)
+		return links
 	}
-	defer response.Body.Close();
-	doc,err := goquery.NewDocumentFromReader(response.Body);
+	defer response.Body.Close()
+
+	doc, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
-		fmt.Printf("Could not read the body of the url: [%v]\nError: [%v]",url,err);
+		fmt.Printf("Could not read the body of the url: [%v]\nError: [%v]\n", url, err)
+		return links
 	}
+
 	doc.Find("a[href]").Each(func(_ int, s *goquery.Selection) {
 		link, exists := s.Attr("href")
 		if exists {
-			links = append(links, link)
-			fmt.Println(link)
+			link = strings.TrimSpace(link)
+			if link != "" {
+				links = append(links, link)
+			}
 		}
 	})
 	return links

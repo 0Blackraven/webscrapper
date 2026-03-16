@@ -19,11 +19,13 @@ func init() {
     )
 }
 
-func Add(url string) {
-    _, err := bloomFilter.Add("mybloom", url)
+func Add(url string) bool {
+    added, err := bloomFilter.Add("mybloom", url)
     if err != nil {
         fmt.Printf("Accounted error while trying to add url to bloomfilter\nError: [%v]\n", err)
+        return false
     }
+    return added
 }
 
 func Check(url string) bool{

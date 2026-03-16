@@ -1,28 +1,36 @@
 package utils
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/0Blackraven/webscrapper/utils/redis"
 )
 
 func AddJob(url string, depth int) {
-	normalizedUrl := url
-	if strings.HasPrefix(normalizedUrl, "https://") {
-		normalizedUrl = "http://" + normalizedUrl[8:]
-	}
-	normalizedUrl = strings.TrimSuffix(normalizedUrl, "/")
-	job := redis.Job{
-		Url:   normalizedUrl,
-		Depth: depth,
-	}
-	if !redis.Check(normalizedUrl) {
-		redis.AddToQueue(job)
-	}
+    normalizedUrl := cleanURL(url)
+    if normalizedUrl == "" {
+        return
+    }
+
+    isNew:= redis.Add(normalizedUrl) 
+    if isNew {
+        redis.AddToQueue(redis.Job{Url: normalizedUrl, Depth: depth})
+    } else {
+
+        fmt.Printf("[Duplicate] Skipping %s\n", normalizedUrl)
+    }
+}
+
+func cleanURL(url string) string {
+    u := strings.TrimSpace(url)
+    u = strings.ToLower(u) 
+    u = strings.TrimSuffix(u, "/")
+    u = strings.Replace(u, "https://", "http://", 1) 
+    return u
 }
 
 func GetJob() string {
 	job := redis.RemoveFromQueue()
-	redis.Add(job.Url)
 	return job.Url
 }
