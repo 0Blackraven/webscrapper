@@ -23,12 +23,21 @@ func HtmlParser (url string) []string {
 		return links
 	}
 
+	base, _ := BaseUrl(url)
+	seen := make(map[string]bool)
+
 	doc.Find("a[href]").Each(func(_ int, s *goquery.Selection) {
 		link, exists := s.Attr("href")
 		if exists {
 			link = strings.TrimSpace(link)
 			if link != "" {
-				links = append(links, link)
+				if !strings.HasPrefix(link, "http") {
+					link = base + "/" + strings.TrimPrefix(link, "/")
+				}
+				if !seen[link] {
+					seen[link] = true
+					links = append(links, link)
+				}
 			}
 		}
 	})

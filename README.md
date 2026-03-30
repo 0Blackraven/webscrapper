@@ -81,4 +81,10 @@ go run real_benchmark.go -u "https://books.toscrape.com/" -w 20 -c 20 -d 60
 
 ---
 
+## Pain Points 
+
+- robots.txt is fetched everytime a url is crawled
+- very very few times broken links are crawled
+
+
 Basic ref point := https://github.com/tonywangcn/distributed-web-crawler/blob/master/go/src/crawler/crawler.go

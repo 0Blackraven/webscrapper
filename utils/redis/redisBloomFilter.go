@@ -1,38 +1,28 @@
 package redis
 
 import (
-
 	"fmt"
-	"os"
-    "github.com/joho/godotenv"
-	"github.com/RedisBloom/redisbloom-go"
 )
 
-var bloomFilter *redis_bloom_go.Client
-
 func init() {
-    godotenv.Load()
-    var pass = os.Getenv("REDIS_PASS")
-    var addr = os.Getenv("REDIS_ADDR")
-    bloomFilter = redis_bloom_go.NewClient(
-        addr, "bloom", &pass,
-    )
+	redisdb.Do(ctx, "DEL", "mybloom")
+	redisdb.Do(ctx, "BF.RESERVE", "mybloom", 0.01, 1000000)
 }
 
 func Add(url string) bool {
-    added, err := bloomFilter.Add("mybloom", url)
-    if err != nil {
-        fmt.Printf("Accounted error while trying to add url to bloomfilter\nError: [%v]\n", err)
-        return false
-    }
-    return added
+	result, err := redisdb.Do(ctx, "BF.ADD", "mybloom", url).Bool()
+	if err != nil {
+		fmt.Printf("Accounted error while trying to add url to bloomfilter\nError: [%v]\n", err)
+		return false
+	}
+	return result
 }
 
-func Check(url string) bool{
-    var ok = false
-    ok,err := bloomFilter.Exists("mybloom", url)
-    if err != nil {
-        fmt.Printf("Accounted error while trying to find url in bloomfilter\nError: [%v]\n",err)
-    }
-    return ok
+func Check(url string) bool {
+	result, err := redisdb.Do(ctx, "BF.EXISTS", "mybloom", url).Bool()
+	if err != nil {
+		fmt.Printf("Accounted error while trying to find url in bloomfilter\nError: [%v]\n", err)
+		return false
+	}
+	return result
 }

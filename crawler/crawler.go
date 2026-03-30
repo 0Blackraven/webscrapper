@@ -10,7 +10,8 @@ import (
 
 func Crawl(url string, foundLinks chan<- string) {
 
-	disallowed := utils.RobotResolver(url)
+	baseUrl,_ := utils.BaseUrl(url)
+	disallowed := utils.RobotResolver(baseUrl)
 
 	for _, path := range disallowed {
 		if strings.Contains(url, path) {
